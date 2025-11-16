@@ -6,16 +6,23 @@ export default function AudioAmbience() {
 
   useEffect(() => {
     if (enabled && ref.current) {
-      ref.current.volume = 0.35
-      ref.current.play().catch(() => {})
+      ref.current.volume = 0.25
+      const play = () => ref.current?.play().catch(() => {})
+      // Attempt play when toggled and also when user interacts (mobile autoplay)
+      play()
+      const onTap = () => play()
+      window.addEventListener('pointerdown', onTap, { once: true })
+      return () => window.removeEventListener('pointerdown', onTap)
     }
   }, [enabled])
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-4 right-4 left-auto z-50">
       <button
         onClick={() => setEnabled(!enabled)}
         className={`px-3 py-2 rounded-md text-sm font-semibold backdrop-blur bg-black/40 border border-white/10 ${enabled ? 'text-amber-200' : 'text-white/80'}`}
+        aria-pressed={enabled}
+        aria-label={enabled ? 'Turn ambient sound off' : 'Turn ambient sound on'}
       >
         {enabled ? 'Sound: On' : 'Sound: Off'}
       </button>
